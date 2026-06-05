@@ -2,3 +2,5 @@ langchain
 langchain_openrouter
 pydantic
 requests
+sqlalchemy
+psycopg2-binary

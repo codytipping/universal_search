@@ -1,7 +1,12 @@
 # External
+import enum
+import re
+import typing
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Any, Dict, List
+from sqlalchemy import Table, Column, MetaData, Text, DateTime, String
+from sqlalchemy.dialects.postgresql import ARRAY
 
 # Internal
 from app.types import Priority, ProjectStatus, AccessLevel, Universe
@@ -43,6 +48,35 @@ class UniversalSearchPayload(BaseModel):
     )
 
 
+class SqlUniverseModel(BaseModel):
+    """
+    A custom base class that equips all child models with automated
+    linguistic specification parsing capabilities for the search agent prompt.
+    """
+
+    @classmethod
+    def to_sqlalchemy_table(cls, table_name: Universe, metadata: MetaData) -> Table:
+        seen: set[str] = set()
+        columns: list[Column] = []
+        for field_name, field_info in cls.model_fields.items():
+            col_name = re.sub(r"_(after|before)$", "", field_name)
+            if col_name in seen:
+                continue
+            seen.add(col_name)
+            columns.append(Column(col_name, cls._sql_type(field_info.annotation)))
+        return Table(table_name.value, metadata, *columns)
+
+    @classmethod
+    def _sql_type(cls, annotation: type) -> object:
+        if annotation is datetime:
+            return DateTime(timezone=True)
+        if isinstance(annotation, type) and issubclass(annotation, enum.Enum):
+            return String()
+        if typing.get_origin(annotation) is list:
+            return ARRAY(String())
+        return Text()
+
+
 class UniverseModel(BaseModel):
     """
     Custom base class that equips all child models with automated
@@ -51,40 +85,38 @@ class UniverseModel(BaseModel):
 
     @classmethod
     def create_universe_definition_prompt(cls, universe_name: Universe) -> str:
-        """
-        Reflects over the specific child class calling this method and builds
-        the precise string layout required by the search coordinator.
-        """
-        
-        # Setup the precise header layout requested
         block = [f"Universe Name: {universe_name}. Description: {cls.__doc__.strip()} Fields:"]
-        
-        # Pull field properties via Pydantic reflection on the subclass (cls)
         properties: dict = cls.model_json_schema().get("properties", {})
-        
+
         for name, meta in properties.items():
             field_desc = meta.get("description", "No explicit field description declared.")
             field_type = meta.get("type", "string")
-            
-            # Enrich type formatting context for complex sub-types
+            field_role = "search"
+
             if "enum" in meta:
                 choices = ", ".join([f"'{c}'" for c in meta["enum"]])
                 field_type = f"Enum: [{choices}]"
+                field_role = "filter"
             elif field_type == "array":
                 items_type = meta.get("items", {}).get("type", "string")
                 field_type = f"List of {items_type}s"
+                field_role = "filter"
             elif meta.get("format") == "date-time":
                 field_type = "string (ISO date-time format: YYYY-MM-DDTHH:MM:SS)"
-            
-            # Add the precise markdown bullet point format
-            block.append(f"- {name} ({field_type}): {field_desc}")
-            
+                field_role = "filter"
+
+            block.append(f"- {name} ({field_type}) [{field_role}]: {field_desc}")
+
         return "\n".join(block)
 
 
-class UserMemories(UniverseModel):
+class UserMemories(UniverseModel, SqlUniverseModel):
     """A personalized timeline capturing individual user preferences, milestones, behavioral contexts, and historical user-agent interactions."""
 
+    memory: str = Field(
+        ...,
+        description="The detailed content of the user memory, preference, or historical interaction context."
+    )
     category: str = Field(
         ..., 
         description="The classification of the memory, e.g., 'preference', 'tool_usage', 'personal_bio', 'professional_milestone'."
@@ -93,23 +125,27 @@ class UserMemories(UniverseModel):
         ...,
         description="The emotional intensity or importance of the memory to the user, ranked as low, medium, or high."
     )
-    created_after: datetime = Field(
+    created_at: datetime = Field(
         ...,
-        description="Filters for memories captured after this specific ISO date format (YYYY-MM-DD)."
-    )
-    created_before: datetime = Field(
-        ...,
-        description="Filters for memories captured before this specific ISO date format (YYYY-MM-DD)."
+        description="Datetime when this memory was captured in ISO date format (YYYY-MM-DD)."
     )
 
     @classmethod
     def create_universe_definition_prompt(cls) -> str:
         return super().create_universe_definition_prompt(Universe.USER_MEMORIES)
+    
+    @classmethod
+    def to_sqlalchemy_table(cls, metadata: MetaData) -> Table:
+        return super().to_sqlalchemy_table(Universe.USER_MEMORIES, metadata)
 
 
-class TeamProjects(UniverseModel):
+class TeamProjects(UniverseModel, SqlUniverseModel):
     """An operational tracking ledger representing shared group work initiatives, delivery schedules, ownership, and project workspaces."""
 
+    project_report: str = Field(
+        ...,
+        description="A comprehensive narrative of the project's current state, recent developments, or specific challenges faced."
+    )
     status: ProjectStatus = Field(
         ...,
         description="The exact current operational state of the target project."
@@ -135,10 +171,18 @@ class TeamProjects(UniverseModel):
     def create_universe_definition_prompt(cls) -> str:
         return super().create_universe_definition_prompt(Universe.TEAM_PROJECTS)
 
+    @classmethod
+    def to_sqlalchemy_table(cls, metadata: MetaData) -> Table:
+        return super().to_sqlalchemy_table(Universe.TEAM_PROJECTS, metadata)
 
-class OrganizationKnowledge(UniverseModel):
+
+class OrganizationKnowledge(UniverseModel, SqlUniverseModel):
     """A comprehensive institutional repository housing authoritative corporate documentation, standard operating procedures, policies, and internal guides."""
 
+    report: str = Field(
+        ...,
+        description="A detailed summary of the document's content, key points, or specific sections relevant to the search context."
+    )
     document_type: str = Field(
         ...,
         description="The nature of the knowledge base document, e.g., 'SOP', 'Architecture_RFC', 'HR_Policy', 'Onboarding_Guide'."
@@ -151,15 +195,18 @@ class OrganizationKnowledge(UniverseModel):
         ...,
         description="The explicit compliance security clearance required to inspect the row data."
     )
-    last_reviewed_after: datetime = Field(
-        ...,
-        description="Filters for documents that passed a governance compliance review after this date."
-    )
-    tags: List[str] = Field(
-        ...,
-        description="An array list of explicit, exact taxonomy string tags assigned to the document node."
-    )
 
     @classmethod
     def create_universe_definition_prompt(cls) -> str:
         return super().create_universe_definition_prompt(Universe.ORGANIZATION_KNOWLEDGE)
+
+    @classmethod
+    def to_sqlalchemy_table(cls, metadata: MetaData) -> Table:
+        return super().to_sqlalchemy_table(Universe.ORGANIZATION_KNOWLEDGE, metadata)
+
+
+UNIVERSE_REGISTRY: dict[Universe, type[UniverseModel]] = {
+    Universe.USER_MEMORIES: UserMemories,
+    Universe.TEAM_PROJECTS: TeamProjects,
+    Universe.ORGANIZATION_KNOWLEDGE: OrganizationKnowledge,
+}

@@ -15,11 +15,12 @@ Identify the core data entity requested. Map this to the target database table n
 {"\n".join(f"- {u.value}" for u in Universe)}
 
 2. METADATA FILTERS EXTRACTION:
-Isolate fields and values that act as hard bounding limits (e.g., priority, status, access). 
-CRITICAL RULE: Universe field filters are static boundaries. They must NEVER appear inside the logic expression or search variables arrays.
+Isolate fields and values that act as hard bounding limits. Only use fields tagged [filter] in the universe catalog below.
+CRITICAL RULE: [filter] fields are static boundaries. They must NEVER appear inside the logic expression or search variables arrays.
 
 3. SEARCH VARIABLES FLAT EXTRACTION (GENERATIVE TRANSFORMATION):
-Analyze the unstructured parts of the user's request and **transform them into one or more optimized search terms**. Do not simply copy-paste the user's raw sentence; distill their intent into distinct atomic feature concepts. 
+Analyze the unstructured parts of the user's request and **transform them into one or more optimized search terms**. Only target fields tagged [search] in the universe catalog — these are the full-text columns the engine searches against.
+Do not simply copy-paste the user's raw sentence; distill their intent into distinct atomic feature concepts.
 Assign each generated concept a unique ID sequence ('v1', 'v2', etc.) and classify it into one of these Match Types:
 - 'Keyword': Generate exact terminology, explicit code strings, explicit alphanumeric tracking numbers, or precise standalone phrases. Expand synonyms if helpful, ensuring the generated term matches word-for-word against exact text.
 - 'Semantic': Generate optimized, fluid conceptual descriptions, background themes, or narrative summaries. If the user query is vague, synthesize a descriptive phrase that captures the underlying abstract meaning or topic for vector embedding lookup.
