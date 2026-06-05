@@ -1,0 +1,396 @@
+{
+  "metadata": {
+    "model": "google/gemini-3.1-pro-preview",
+    "date": "2026-06-05T19:46:23.589278+00:00"
+  },
+  "User Memories": [
+    {
+      "query": "Show me my memories about Python.",
+      "payload": {
+        "target_table": "User Memories",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "Python"
+          }
+        ],
+        "logic_expression": "v1",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"User Memories\".memory, \"User Memories\".category, \"User Memories\".emotional_salience, \"User Memories\".created_at \nFROM \"User Memories\" \nWHERE \"User Memories\".memory ILIKE '%%Python%%' OR \"User Memories\".category ILIKE '%%Python%%'"
+    },
+    {
+      "query": "Find my high importance memories about Python.",
+      "payload": {
+        "target_table": "User Memories",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "high"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "Python"
+          }
+        ],
+        "logic_expression": "v1 AND v2",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"User Memories\".memory, \"User Memories\".category, \"User Memories\".emotional_salience, \"User Memories\".created_at \nFROM \"User Memories\" \nWHERE (\"User Memories\".memory ILIKE '%%high%%' OR \"User Memories\".category ILIKE '%%high%%') AND (\"User Memories\".memory ILIKE '%%Python%%' OR \"User Memories\".category ILIKE '%%Python%%')"
+    },
+    {
+      "query": "Find memories about Python or machine learning.",
+      "payload": {
+        "target_table": "User Memories",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "Python"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "machine learning"
+          }
+        ],
+        "logic_expression": "v1 OR v2",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"User Memories\".memory, \"User Memories\".category, \"User Memories\".emotional_salience, \"User Memories\".created_at \nFROM \"User Memories\" \nWHERE \"User Memories\".memory ILIKE '%%Python%%' OR \"User Memories\".category ILIKE '%%Python%%' OR \"User Memories\".memory ILIKE '%%machine learning%%' OR \"User Memories\".category ILIKE '%%machine learning%%'"
+    },
+    {
+      "query": "Find my personal biography memories that aren't about professional milestones, captured before 2025.",
+      "payload": {
+        "target_table": "User Memories",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "personal_bio"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "professional_milestone"
+          }
+        ],
+        "logic_expression": "v1 AND NOT v2",
+        "metadata_filters": {
+          "created_at": "< 2025-01-01T00:00:00"
+        }
+      },
+      "sql": "SELECT \"User Memories\".memory, \"User Memories\".category, \"User Memories\".emotional_salience, \"User Memories\".created_at \nFROM \"User Memories\" \nWHERE (\"User Memories\".memory ILIKE '%%personal_bio%%' OR \"User Memories\".category ILIKE '%%personal_bio%%') AND NOT (\"User Memories\".memory ILIKE '%%professional_milestone%%' OR \"User Memories\".category ILIKE '%%professional_milestone%%') AND \"User Memories\".created_at = '< 2025-01-01T00:00:00'"
+    },
+    {
+      "query": "Show me high importance memories about career achievements or programming that aren't related to hobbies, from before 2025.",
+      "payload": {
+        "target_table": "User Memories",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "high"
+          },
+          {
+            "id": "v2",
+            "match_type": "Semantic",
+            "search_signal": "career achievements professional milestone"
+          },
+          {
+            "id": "v3",
+            "match_type": "Semantic",
+            "search_signal": "programming coding software development"
+          },
+          {
+            "id": "v4",
+            "match_type": "Semantic",
+            "search_signal": "hobbies leisure recreational activities"
+          }
+        ],
+        "logic_expression": "v1 AND (v2 OR v3) AND NOT v4",
+        "metadata_filters": {
+          "created_at": "< 2025-01-01T00:00:00"
+        }
+      },
+      "sql": "SELECT \"User Memories\".memory, \"User Memories\".category, \"User Memories\".emotional_salience, \"User Memories\".created_at \nFROM \"User Memories\" \nWHERE (\"User Memories\".memory ILIKE '%%high%%' OR \"User Memories\".category ILIKE '%%high%%') AND (\"User Memories\".memory ILIKE '%%career achievements professional milestone%%' OR \"User Memories\".category ILIKE '%%career achievements professional milestone%%' OR \"User Memories\".memory ILIKE '%%programming coding software development%%' OR \"User Memories\".category ILIKE '%%programming coding software development%%') AND NOT (\"User Memories\".memory ILIKE '%%hobbies leisure recreational activities%%' OR \"User Memories\".category ILIKE '%%hobbies leisure recreational activities%%') AND \"User Memories\".created_at = '< 2025-01-01T00:00:00'"
+    }
+  ],
+  "Team Projects": [
+    {
+      "query": "Find all projects about mobile app.",
+      "payload": {
+        "target_table": "Team Projects",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Semantic",
+            "search_signal": "mobile app development, iOS, Android, mobile application"
+          }
+        ],
+        "logic_expression": "v1",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"Team Projects\".project_report, \"Team Projects\".status, \"Team Projects\".priority, \"Team Projects\".owner_team, \"Team Projects\".lead_user_id, \"Team Projects\".target_quarter \nFROM \"Team Projects\" \nWHERE \"Team Projects\".project_report ILIKE '%%mobile app development, iOS, Android, mobile application%%' OR \"Team Projects\".owner_team ILIKE '%%mobile app development, iOS, Android, mobile application%%' OR \"Team Projects\".lead_user_id ILIKE '%%mobile app development, iOS, Android, mobile application%%' OR \"Team Projects\".target_quarter ILIKE '%%mobile app development, iOS, Android, mobile application%%'"
+    },
+    {
+      "query": "Find all in-progress projects about mobile app.",
+      "payload": {
+        "target_table": "Team Projects",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "in-progress"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "mobile app"
+          },
+          {
+            "id": "v3",
+            "match_type": "Semantic",
+            "search_signal": "mobile application development"
+          }
+        ],
+        "logic_expression": "v1 AND (v2 OR v3)",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"Team Projects\".project_report, \"Team Projects\".status, \"Team Projects\".priority, \"Team Projects\".owner_team, \"Team Projects\".lead_user_id, \"Team Projects\".target_quarter \nFROM \"Team Projects\" \nWHERE (\"Team Projects\".project_report ILIKE '%%in-progress%%' OR \"Team Projects\".owner_team ILIKE '%%in-progress%%' OR \"Team Projects\".lead_user_id ILIKE '%%in-progress%%' OR \"Team Projects\".target_quarter ILIKE '%%in-progress%%') AND (\"Team Projects\".project_report ILIKE '%%mobile app%%' OR \"Team Projects\".owner_team ILIKE '%%mobile app%%' OR \"Team Projects\".lead_user_id ILIKE '%%mobile app%%' OR \"Team Projects\".target_quarter ILIKE '%%mobile app%%' OR \"Team Projects\".project_report ILIKE '%%mobile application development%%' OR \"Team Projects\".owner_team ILIKE '%%mobile application development%%' OR \"Team Projects\".lead_user_id ILIKE '%%mobile application development%%' OR \"Team Projects\".target_quarter ILIKE '%%mobile application development%%')"
+    },
+    {
+      "query": "Find high priority in-progress projects about API development.",
+      "payload": {
+        "target_table": "Team Projects",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "high priority"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "in-progress"
+          },
+          {
+            "id": "v3",
+            "match_type": "Semantic",
+            "search_signal": "API development"
+          }
+        ],
+        "logic_expression": "v1 AND v2 AND v3",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"Team Projects\".project_report, \"Team Projects\".status, \"Team Projects\".priority, \"Team Projects\".owner_team, \"Team Projects\".lead_user_id, \"Team Projects\".target_quarter \nFROM \"Team Projects\" \nWHERE (\"Team Projects\".project_report ILIKE '%%high priority%%' OR \"Team Projects\".owner_team ILIKE '%%high priority%%' OR \"Team Projects\".lead_user_id ILIKE '%%high priority%%' OR \"Team Projects\".target_quarter ILIKE '%%high priority%%') AND (\"Team Projects\".project_report ILIKE '%%in-progress%%' OR \"Team Projects\".owner_team ILIKE '%%in-progress%%' OR \"Team Projects\".lead_user_id ILIKE '%%in-progress%%' OR \"Team Projects\".target_quarter ILIKE '%%in-progress%%') AND (\"Team Projects\".project_report ILIKE '%%API development%%' OR \"Team Projects\".owner_team ILIKE '%%API development%%' OR \"Team Projects\".lead_user_id ILIKE '%%API development%%' OR \"Team Projects\".target_quarter ILIKE '%%API development%%')"
+    },
+    {
+      "query": "Find high priority in-progress projects covering both API and payment processing.",
+      "payload": {
+        "target_table": "Team Projects",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "high priority"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "in-progress"
+          },
+          {
+            "id": "v3",
+            "match_type": "Keyword",
+            "search_signal": "API"
+          },
+          {
+            "id": "v4",
+            "match_type": "Semantic",
+            "search_signal": "payment processing"
+          }
+        ],
+        "logic_expression": "v1 AND v2 AND v3 AND v4",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"Team Projects\".project_report, \"Team Projects\".status, \"Team Projects\".priority, \"Team Projects\".owner_team, \"Team Projects\".lead_user_id, \"Team Projects\".target_quarter \nFROM \"Team Projects\" \nWHERE (\"Team Projects\".project_report ILIKE '%%high priority%%' OR \"Team Projects\".owner_team ILIKE '%%high priority%%' OR \"Team Projects\".lead_user_id ILIKE '%%high priority%%' OR \"Team Projects\".target_quarter ILIKE '%%high priority%%') AND (\"Team Projects\".project_report ILIKE '%%in-progress%%' OR \"Team Projects\".owner_team ILIKE '%%in-progress%%' OR \"Team Projects\".lead_user_id ILIKE '%%in-progress%%' OR \"Team Projects\".target_quarter ILIKE '%%in-progress%%') AND (\"Team Projects\".project_report ILIKE '%%API%%' OR \"Team Projects\".owner_team ILIKE '%%API%%' OR \"Team Projects\".lead_user_id ILIKE '%%API%%' OR \"Team Projects\".target_quarter ILIKE '%%API%%') AND (\"Team Projects\".project_report ILIKE '%%payment processing%%' OR \"Team Projects\".owner_team ILIKE '%%payment processing%%' OR \"Team Projects\".lead_user_id ILIKE '%%payment processing%%' OR \"Team Projects\".target_quarter ILIKE '%%payment processing%%')"
+    },
+    {
+      "query": "Find high priority Q1-2026 projects about machine learning or data pipelines, but exclude anything focused on ETL migration.",
+      "payload": {
+        "target_table": "Team Projects",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "high"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "Q1-2026"
+          },
+          {
+            "id": "v3",
+            "match_type": "Semantic",
+            "search_signal": "machine learning"
+          },
+          {
+            "id": "v4",
+            "match_type": "Semantic",
+            "search_signal": "data pipelines"
+          },
+          {
+            "id": "v5",
+            "match_type": "Semantic",
+            "search_signal": "ETL migration"
+          }
+        ],
+        "logic_expression": "v1 AND v2 AND (v3 OR v4) AND NOT v5",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"Team Projects\".project_report, \"Team Projects\".status, \"Team Projects\".priority, \"Team Projects\".owner_team, \"Team Projects\".lead_user_id, \"Team Projects\".target_quarter \nFROM \"Team Projects\" \nWHERE (\"Team Projects\".project_report ILIKE '%%high%%' OR \"Team Projects\".owner_team ILIKE '%%high%%' OR \"Team Projects\".lead_user_id ILIKE '%%high%%' OR \"Team Projects\".target_quarter ILIKE '%%high%%') AND (\"Team Projects\".project_report ILIKE '%%Q1-2026%%' OR \"Team Projects\".owner_team ILIKE '%%Q1-2026%%' OR \"Team Projects\".lead_user_id ILIKE '%%Q1-2026%%' OR \"Team Projects\".target_quarter ILIKE '%%Q1-2026%%') AND (\"Team Projects\".project_report ILIKE '%%machine learning%%' OR \"Team Projects\".owner_team ILIKE '%%machine learning%%' OR \"Team Projects\".lead_user_id ILIKE '%%machine learning%%' OR \"Team Projects\".target_quarter ILIKE '%%machine learning%%' OR \"Team Projects\".project_report ILIKE '%%data pipelines%%' OR \"Team Projects\".owner_team ILIKE '%%data pipelines%%' OR \"Team Projects\".lead_user_id ILIKE '%%data pipelines%%' OR \"Team Projects\".target_quarter ILIKE '%%data pipelines%%') AND NOT (\"Team Projects\".project_report ILIKE '%%ETL migration%%' OR \"Team Projects\".owner_team ILIKE '%%ETL migration%%' OR \"Team Projects\".lead_user_id ILIKE '%%ETL migration%%' OR \"Team Projects\".target_quarter ILIKE '%%ETL migration%%')"
+    }
+  ],
+  "Organization Knowledge": [
+    {
+      "query": "Find documents about security policy.",
+      "payload": {
+        "target_table": "Organization Knowledge",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Semantic",
+            "search_signal": "corporate security policy, rules, and guidelines"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "security policy"
+          }
+        ],
+        "logic_expression": "v1 OR v2",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"Organization Knowledge\".report, \"Organization Knowledge\".document_type, \"Organization Knowledge\".department, \"Organization Knowledge\".access_level \nFROM \"Organization Knowledge\" \nWHERE \"Organization Knowledge\".report ILIKE '%%corporate security policy, rules, and guidelines%%' OR \"Organization Knowledge\".document_type ILIKE '%%corporate security policy, rules, and guidelines%%' OR \"Organization Knowledge\".department ILIKE '%%corporate security policy, rules, and guidelines%%' OR \"Organization Knowledge\".report ILIKE '%%security policy%%' OR \"Organization Knowledge\".document_type ILIKE '%%security policy%%' OR \"Organization Knowledge\".department ILIKE '%%security policy%%'"
+    },
+    {
+      "query": "Find internal documents about security policy.",
+      "payload": {
+        "target_table": "Organization Knowledge",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Semantic",
+            "search_signal": "internal security policy, rules, and procedures"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "Security"
+          },
+          {
+            "id": "v3",
+            "match_type": "Keyword",
+            "search_signal": "Policy"
+          }
+        ],
+        "logic_expression": "v1 OR (v2 AND v3)",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"Organization Knowledge\".report, \"Organization Knowledge\".document_type, \"Organization Knowledge\".department, \"Organization Knowledge\".access_level \nFROM \"Organization Knowledge\" \nWHERE \"Organization Knowledge\".report ILIKE '%%internal security policy, rules, and procedures%%' OR \"Organization Knowledge\".document_type ILIKE '%%internal security policy, rules, and procedures%%' OR \"Organization Knowledge\".department ILIKE '%%internal security policy, rules, and procedures%%' OR (\"Organization Knowledge\".report ILIKE '%%Security%%' OR \"Organization Knowledge\".document_type ILIKE '%%Security%%' OR \"Organization Knowledge\".department ILIKE '%%Security%%') AND (\"Organization Knowledge\".report ILIKE '%%Policy%%' OR \"Organization Knowledge\".document_type ILIKE '%%Policy%%' OR \"Organization Knowledge\".department ILIKE '%%Policy%%')"
+    },
+    {
+      "query": "Find public onboarding guides from the HR department.",
+      "payload": {
+        "target_table": "Organization Knowledge",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "public"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "Onboarding_Guide"
+          },
+          {
+            "id": "v3",
+            "match_type": "Keyword",
+            "search_signal": "HR"
+          }
+        ],
+        "logic_expression": "v1 AND v2 AND v3",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"Organization Knowledge\".report, \"Organization Knowledge\".document_type, \"Organization Knowledge\".department, \"Organization Knowledge\".access_level \nFROM \"Organization Knowledge\" \nWHERE (\"Organization Knowledge\".report ILIKE '%%public%%' OR \"Organization Knowledge\".document_type ILIKE '%%public%%' OR \"Organization Knowledge\".department ILIKE '%%public%%') AND (\"Organization Knowledge\".report ILIKE '%%Onboarding_Guide%%' OR \"Organization Knowledge\".document_type ILIKE '%%Onboarding_Guide%%' OR \"Organization Knowledge\".department ILIKE '%%Onboarding_Guide%%') AND (\"Organization Knowledge\".report ILIKE '%%HR%%' OR \"Organization Knowledge\".document_type ILIKE '%%HR%%' OR \"Organization Knowledge\".department ILIKE '%%HR%%')"
+    },
+    {
+      "query": "Find internal security documents that aren't drafts.",
+      "payload": {
+        "target_table": "Organization Knowledge",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "Security"
+          },
+          {
+            "id": "v2",
+            "match_type": "Semantic",
+            "search_signal": "internal security documents and policies"
+          },
+          {
+            "id": "v3",
+            "match_type": "Keyword",
+            "search_signal": "draft"
+          }
+        ],
+        "logic_expression": "(v1 OR v2) AND NOT v3",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"Organization Knowledge\".report, \"Organization Knowledge\".document_type, \"Organization Knowledge\".department, \"Organization Knowledge\".access_level \nFROM \"Organization Knowledge\" \nWHERE (\"Organization Knowledge\".report ILIKE '%%Security%%' OR \"Organization Knowledge\".document_type ILIKE '%%Security%%' OR \"Organization Knowledge\".department ILIKE '%%Security%%' OR \"Organization Knowledge\".report ILIKE '%%internal security documents and policies%%' OR \"Organization Knowledge\".document_type ILIKE '%%internal security documents and policies%%' OR \"Organization Knowledge\".department ILIKE '%%internal security documents and policies%%') AND NOT (\"Organization Knowledge\".report ILIKE '%%draft%%' OR \"Organization Knowledge\".document_type ILIKE '%%draft%%' OR \"Organization Knowledge\".department ILIKE '%%draft%%')"
+    },
+    {
+      "query": "Find confidential DevOps documents about system architecture or compliance, but exclude anything mentioning legacy systems.",
+      "payload": {
+        "target_table": "Organization Knowledge",
+        "search_variables": [
+          {
+            "id": "v1",
+            "match_type": "Keyword",
+            "search_signal": "confidential"
+          },
+          {
+            "id": "v2",
+            "match_type": "Keyword",
+            "search_signal": "DevOps"
+          },
+          {
+            "id": "v3",
+            "match_type": "Semantic",
+            "search_signal": "system architecture"
+          },
+          {
+            "id": "v4",
+            "match_type": "Semantic",
+            "search_signal": "compliance"
+          },
+          {
+            "id": "v5",
+            "match_type": "Semantic",
+            "search_signal": "legacy systems"
+          }
+        ],
+        "logic_expression": "v1 AND v2 AND (v3 OR v4) AND NOT v5",
+        "metadata_filters": {}
+      },
+      "sql": "SELECT \"Organization Knowledge\".report, \"Organization Knowledge\".document_type, \"Organization Knowledge\".department, \"Organization Knowledge\".access_level \nFROM \"Organization Knowledge\" \nWHERE (\"Organization Knowledge\".report ILIKE '%%confidential%%' OR \"Organization Knowledge\".document_type ILIKE '%%confidential%%' OR \"Organization Knowledge\".department ILIKE '%%confidential%%') AND (\"Organization Knowledge\".report ILIKE '%%DevOps%%' OR \"Organization Knowledge\".document_type ILIKE '%%DevOps%%' OR \"Organization Knowledge\".department ILIKE '%%DevOps%%') AND (\"Organization Knowledge\".report ILIKE '%%system architecture%%' OR \"Organization Knowledge\".document_type ILIKE '%%system architecture%%' OR \"Organization Knowledge\".department ILIKE '%%system architecture%%' OR \"Organization Knowledge\".report ILIKE '%%compliance%%' OR \"Organization Knowledge\".document_type ILIKE '%%compliance%%' OR \"Organization Knowledge\".department ILIKE '%%compliance%%') AND NOT (\"Organization Knowledge\".report ILIKE '%%legacy systems%%' OR \"Organization Knowledge\".document_type ILIKE '%%legacy systems%%' OR \"Organization Knowledge\".department ILIKE '%%legacy systems%%')"
+    }
+  ]
+}
