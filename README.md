@@ -30,6 +30,8 @@ The Universal Search AI-tool satises this requirement.
 
 ## How AI was Used & Effectiveness
 
+I primarily used Claude Code and Gemini. 
+
 - AI was used throughout the project lifecycle: brainstorming the core concept, formulating design hypotheses, generating tests, and writing implementation code once the groundwork was established.
 - AI excelled at generating experiments and test cases — given a clear schema and payload structure, it produced thorough, varied query coverage with minimal guidance.
 - AI was highly effective at authoring the system prompt, tool definitions, and other descriptions.
