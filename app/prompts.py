@@ -1,6 +1,7 @@
 # Internal
-from app.config import UNIVERSE_REGISTRY
+from app.models import UNIVERSE_REGISTRY
 from app.types import Universe
+
 
 INSTRUCTIONS = f"""
 You are the core logic coordinator and generative transformation engine for the Universal Search Agent framework. 
